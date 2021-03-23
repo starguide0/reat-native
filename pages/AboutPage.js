@@ -28,7 +28,6 @@ const styles = StyleSheet.create({
         color: 'white',
         fontSize: 30,
         fontWeight: '700',
-        fontFamily: 'Godic',
         marginBottom: 30,
         marginTop: 30,
     },
