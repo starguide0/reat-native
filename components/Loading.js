@@ -5,7 +5,6 @@ export default function Loading(){
     return(<View style={styles.container}><Text style={styles.title}>준비중입니다...</Text></View>)
 }
 
-
 const styles = StyleSheet.create({
     container: {
         //앱의 배경 색
