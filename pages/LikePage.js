@@ -1,20 +1,45 @@
 import React, {useState, useEffect} from 'react';
-import {StyleSheet, Text, View, Image, TouchableOpacity, ScrollView} from 'react-native';
+import {StyleSheet, Text, View, Image, TouchableOpacity, ScrollView, Alert} from 'react-native';
 import LikeCard from '../components/LikeCard';
+import {firebase_db} from "../firebaseConfig";
+import Constants from 'expo-constants';
+import Loading from "../components/Loading";
 
 export default function LikePage({navigation, route}) {
+    console.disableYellowBox = true;
     //return 구문 밖에서는 슬래시 두개 방식으로 주석
-    const tip = route.params;
+    let [tip, setTip] = useState([]);
+    let [ready, setReady] = useState(false);
+
     useEffect(() => {
         console.log(route)
         navigation.setOptions({
             title: '꿀팁 찜'
         })
+        pageUpdate();
     }, [])
+
+    const pageUpdate = () => {
+        firebase_db.ref(`/like/${Constants.installationId}`).once('value').then((snapshot) => {
+            if (snapshot.exists()) {
+                setTip(Object.values(snapshot.val()));
+                setReady(true)
+            } else {
+                Alert.alert(
+                    "찜 정보",
+                    "찜한 데이터가 없습니다.",
+                    [{
+                        text: "Ok",
+                        onPress: () => navigation.navigate("MainPage"),
+                    }]
+                );
+            }
+        })
+    }
 
     //처음 ready 상태값은 true 이므로 ? 물음표 바로 뒤에 값이 반환(그려짐)됨
     //useEffect로 인해 데이터가 준비되고, ready 값이 변경되면 : 콜론 뒤의 값이 반환(그려짐)
-    return (
+    return !ready ? <Loading/> : (
         /*
           return 구문 안에서는 {슬래시 + * 방식으로 주석
         */
@@ -22,10 +47,9 @@ export default function LikePage({navigation, route}) {
             <View style={styles.cardContainer}>
                 {
                     tip.map((content, i) => {
-                        return (<LikeCard content={content} key={i} navigation={navigation}/>)
+                        return (<LikeCard content={content} pageUpdate={pageUpdate} key={i} navigation={navigation}/>)
                     })
                 }
-
             </View>
         </ScrollView>
     );
